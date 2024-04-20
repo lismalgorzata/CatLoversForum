@@ -1,5 +1,6 @@
 # CatLoversForum
-## Team members: @lismalgorzata (team leader), @malwinakochman, @juliamekarska
+## Team members: @lismalgorzata (team leader), @malwinakochman, @JuliaMekarska
+
 
 #### Our idea is to create a cat forum - an application for sharing photos and comments for cat lovers. The user will be able to insert photos and entries, as well as contact other users under the posts. Each user will have their own set of entries.
 ---
