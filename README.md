@@ -29,3 +29,15 @@ Post on Moodle (every student, not just the project team leader):
 - link to the hosted application
 - project repository in ZIP format
 ---
+## Quick start:
+
+```
+npm install
+```
+```
+npm run build
+```
+```
+npm run serve
+```
+---
