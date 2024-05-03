@@ -1,18 +1,21 @@
 <template>
-  <div id="app">
+  <div class="bg-light">
     <app-navbar></app-navbar>
-    <router-view></router-view>
+    <router-view style="min-height: 100vh"></router-view>
+    <app-footer></app-footer>
   </div>
 </template>
 
 <script>
-import AppNavbar from "@/components/Navbar.vue";
+import AppNavbar from '@/components/Navbar.vue'
+import AppFooter from '@/components/Footer'
 export default {
-  name: "App",
+  name: 'App',
   components: {
     AppNavbar,
-  },
-};
+    AppFooter
+  }
+}
 </script>
 
 <style></style>
