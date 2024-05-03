@@ -33,6 +33,10 @@ Post on Moodle (every student, not just the project team leader):
 ## Project setup
 ```
 npm install
+npm install firebase
+npm install -g firebase-tools
+firebase login
+
 ```
 
 ### Compiles and hot-reloads for development
