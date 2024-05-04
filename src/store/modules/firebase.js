@@ -13,15 +13,16 @@ import { db } from '@/main.js';
 export const actionTypes = {
     getPostsByUserId: '[firedb] getPostsByUserId',
     addPost: '[firedb] addPost',
-    addComment: '[firedb] addComment', // New action type for adding comments
+    addComment: '[firedb] addComment', 
     updatePassword: '[auth] Update Password',
-    getUserDetails: '[auth] Get User Details'
+    getUserDetails: '[auth] Get User Details',
+    fetchComments: '[firedb] fetchComments'
 };
 
 export const mutationType = {
     setPosts: '[firedb] setPosts',
     addPostSuccess: '[firedb] addPostSuccess',
-    addCommentSuccess: '[firedb] addCommentSuccess', // New mutation for successful comment addition
+    addCommentSuccess: '[firedb] addCommentSuccess', 
     addPostStart: '[firedb] addPostStart'
 };
 
@@ -37,8 +38,11 @@ const mutations = {
     [mutationType.addPostSuccess] (state) {
         state.isLoading = false;
     },
-    [mutationType.addCommentSuccess] (state) { // Handles the state change on comment addition
-        state.isLoading = false; // You can modify this as needed
+    [mutationType.addCommentSuccess] (state) { 
+        state.isLoading = false;
+    },
+    setComments(state, comments) {
+        state.comments = comments;
     },
     [mutationType.addPostStart] (state) {
         state.isLoading = true;
@@ -71,7 +75,7 @@ const actions = {
             }
         });
     },
-    [actionTypes.addComment] (context, { postId, comment }) { // New action to add a comment
+    [actionTypes.addComment] (context, { postId, comment }) { 
         console.log("addCommentIsFiring");
         const commentRef = collection(db, "comments", postId, "userComments");
         const auth = getAuth();
@@ -85,6 +89,18 @@ const actions = {
             }).catch(error => {
                 console.error("Error adding comment:", error);
             });
+        }
+    },
+    [actionTypes.fetchComments]: async (context, postId) => {
+        console.log("fetchComments is firing");
+        const commentsQuery = query(collection(db, "comments"), where("postId", "==", postId));
+        try {
+            const querySnapshot = await getDocs(commentsQuery);
+            const comments = querySnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
+            context.commit('setComments', comments); 
+            console.log("Comments fetched successfully", comments);
+        } catch (error) {
+            console.error("Error fetching comments:", error);
         }
     },
     [actionTypes.updatePassword] (context, { newPassword }) {

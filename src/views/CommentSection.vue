@@ -9,6 +9,10 @@
         <textarea v-model="newComment" placeholder="Add a comment..."></textarea>
         <button type="submit">Post Comment</button>
       </form>
+      <!-- Display comments -->
+      <div v-for="comment in comments" :key="comment.id">
+        <p>{{ comment.content }}</p>
+      </div>
     </div>
     <div v-else>
       <p>Loading post...</p>
@@ -18,30 +22,36 @@
 
 <script>
 import { mapActions, mapState } from 'vuex';
-import Post from '@/components/Post.vue'; // Correct import assuming Post.vue is in the components folders
+import Post from '@/components/Post.vue'; 
 import { actionTypes } from '@/store/modules/firebase'
 
 export default {
   components: {
     Post
   },
+  props: ['postId'], 
   data() {
     return {
-      newComment: ''
+      newComment: '',
+      comments: [] 
     };
   },
   computed: {
     ...mapState({
-      posts: (state) => state.firebase.posts // Ensure this matches the Vuex store structure
+      posts: (state) => state.firebase.posts 
     }),
     post() {
       // Ensures post exists and matches the ID from the route
       return this.posts.find(post => post.id === this.$route.params.postId);
     }
   },
+  created() {
+    this.fetchComments(this.$route.params.postId); // Fetch comments when component is created
+  },
   methods: {
     ...mapActions({
-      addCommentToFirestore: actionTypes.addComment // Use the constant from actionTypes
+      addCommentToFirestore: actionTypes.addComment, // Use the constant from actionTypes
+      fetchComments: actionTypes.fetchComments 
     }),
     addComment() {
       if (this.newComment.trim()) {
@@ -49,11 +59,12 @@ export default {
           postId: this.$route.params.postId,
           comment: this.newComment
         }).then(() => {
-          this.newComment = ''; // Clear the comment input field on successful addition
-          alert('Comment added successfully!'); // Optional: Display success message
+          this.newComment = ''; 
+          this.fetchComments(this.$route.params.postId); 
+          alert('Comment added successfully!'); 
         }).catch(error => {
           console.error('Failed to add comment:', error);
-          alert('Failed to add comment. Please try again.'); // Display error message to user
+          alert('Failed to add comment. Please try again.'); 
         });
       }
     }
