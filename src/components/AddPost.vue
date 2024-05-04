@@ -144,12 +144,22 @@ export default {
       isWork: false,
       isPersonal: false,
       checkedTags: ref([]),
+      audioContext: new (window.AudioContext || window.webkitAudioContext)(),
     };
   },
   methods: {
-    playSound() {
-      const audio = new Audio(meowSound);
-      audio.play().catch(e => console.error("Error playing sound:", e));
+    async playSound() {
+      try {
+        const response = await fetch(meowSound);
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+        const source = this.audioContext.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(this.audioContext.destination);
+        source.start();
+      } catch (e) {
+        console.error("Error playing sound:", e);
+      }
     },
     submit() {
       if (this.postTitle.length > 0 && this.postContent.length > 0) {
@@ -160,8 +170,8 @@ export default {
               tags: this.checkedTags,
             })
             .then(async () => {
-              await new Promise((resolve) => setTimeout(resolve, 2000));
               this.playSound();
+              await new Promise((resolve) => setTimeout(resolve, 2000));
               this.$router.go();
             });
       }
