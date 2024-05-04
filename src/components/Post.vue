@@ -87,19 +87,22 @@ export default {
       userHasLiked: false
     }
   },
-  components: {DeleteButton, EditPostButton, PostModal},
+  components: { DeleteButton, EditPostButton, PostModal },
   mounted() {
-    this.auth = getAuth
-    this.auth().onAuthStateChanged((user) => {
+    this.auth.onAuthStateChanged((user) => {
       if (user) {
-        this.currentUserId = user.uid,
-            this.checkUserLike()
+        this.currentUserId = user.uid;
       }
     });
   },
   computed: {
     isPostOwner() {
-      return this.post.data.uid === this.currentUserId
+      return this.post.data.uid === this.currentUserId;
+    }
+  },
+  methods: {
+    viewComments(postId) {
+      this.$router.push({ name: 'comments', params: { postId } });
     }
   },
   methods: {
