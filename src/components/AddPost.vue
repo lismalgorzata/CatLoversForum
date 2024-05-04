@@ -132,6 +132,7 @@
 <script>
 import { actionTypes } from "@/store/modules/firebase";
 import { ref } from "vue";
+import meowSound from '@/assets/cat-meow.wav';
 
 export default {
   name: "AddPost",
@@ -146,6 +147,10 @@ export default {
     };
   },
   methods: {
+    playSound() {
+      const audio = new Audio(meowSound);
+      audio.play().catch(e => console.error("Error playing sound:", e));
+    },
     submit() {
       if (this.postTitle.length > 0 && this.postContent.length > 0) {
         this.$store
@@ -156,6 +161,7 @@ export default {
             })
             .then(async () => {
               await new Promise((resolve) => setTimeout(resolve, 2000));
+              this.playSound();
               this.$router.go();
             });
       }
