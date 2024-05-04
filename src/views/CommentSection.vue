@@ -41,16 +41,20 @@ export default {
     }),
     post() {
       // Ensures post exists and matches the ID from the route
-      return this.posts.find(post => post.id === this.$route.params.postId);
+      return this.posts?.find(post => post.id === this.$route.params.postId);
     }
   },
   created() {
-    this.fetchComments(this.$route.params.postId); // Fetch comments when component is created
+    if (!this.posts) {
+      this.fetchData();  // Assuming this action is defined and does what is intended
+    }
+    this.fetchComments(this.$route.params.postId);
   },
   methods: {
     ...mapActions({
       addCommentToFirestore: actionTypes.addComment,
-      fetchComments: actionTypes.fetchComments // Ensuring this action is properly defined and called
+      fetchComments: actionTypes.fetchComments,
+      fetchData: actionTypes.fetchPosts
     }),
     addComment() {
       if (this.newComment.trim()) {
