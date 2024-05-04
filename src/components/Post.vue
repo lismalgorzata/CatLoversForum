@@ -37,9 +37,6 @@
         {{ tag }}
       </small>
     </div>
-    <div class="card-footer text-left">
-      <button v-if="post.data.data.visibleForOthers === true" class="btn btn-outline-primary" @click="viewComments(postId)">Comments</button>
-    </div>
     <div class="position-absolute end-0">
       <DeleteButton v-if="isPostOwner" :postId="postId"></DeleteButton>
     </div>
@@ -51,10 +48,13 @@
                     :class="{'btn-outline-primary': !userHasLiked, 'btn-primary text-dark': userHasLiked}"
                     @click="toggleLike">
               <i class="bi bi-suit-heart mx-1"></i>
-            </button>
+            </button>  
           </div>
           <div class="col-auto">
             <h6 class="mb-0">{{ postLikes }}</h6>
+          </div>
+          <div class="col-auto align-items-lg-start">
+            <button v-if="post.data.data.visibleForOthers === true" class="btn btn-outline-primary" @click="viewComments(postId)">Comments</button>
           </div>
         </div>
       </div>
@@ -102,6 +102,9 @@ export default {
   },
   methods: {
     toggleLike() {
+      // Vibrate the device twice: vibrate for 500ms, pause for 300ms, vibrate for 500ms again
+      navigator.vibrate([500, 300, 500]);
+
       if (!this.userHasLiked) {
         this.$store.dispatch(actionTypes.incrementLikes, {
           postId: this.post.id,
