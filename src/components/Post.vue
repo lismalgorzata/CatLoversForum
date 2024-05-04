@@ -37,6 +37,9 @@
         {{ tag }}
       </small>
     </div>
+    <div class="card-footer text-left">
+      <button v-if="post.data.data.visibleForOthers === true" class="btn btn-outline-primary" @click="viewComments(postId)">Comments</button>
+    </div>
     <div class="position-absolute end-0">
       <DeleteButton v-if="isPostOwner" :postId="postId"></DeleteButton>
     </div>
@@ -67,7 +70,7 @@ import PostModal from './PostModal.vue'
 import {actionTypes} from "@/store/modules/firebase.js";
 
 export default {
-  name: 'AppPostsView',
+  name: 'PostCard',
   props: {
     post: {
       type: Object,
@@ -76,7 +79,7 @@ export default {
   },
   data() {
     return {
-      auth: '',
+      auth: getAuth(), // Store the initialized authentication object directly
       currentUserId: '',
       postId: this.post.id,
       postColor: this.post.data.data.color,
@@ -92,9 +95,8 @@ export default {
         this.currentUserId = user.uid,
             this.checkUserLike()
       }
-    })
+    });
   },
-
   computed: {
     isPostOwner() {
       return this.post.data.uid === this.currentUserId
