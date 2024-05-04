@@ -1,14 +1,4 @@
 <template>
-  <!-- Button trigger modal -->
-  <button
-      type="button"
-      class="btn btn-success position-fixed bottom-0 end-0 m-3 shadow"
-      data-bs-toggle="modal"
-      data-bs-target="#exampleModal"
-  >
-    <i class="bi bi-plus-circle-fill display-5"></i>
-  </button>
-
   <!-- Modal -->
   <div
       class="modal fade modal-lg"
@@ -94,18 +84,18 @@
               {{ postContent.length }}/255
             </small>
             <div>
-              Post visible for others?
+              Visibility
             </div>
             <div class="form-check">
               <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" value="true" v-model="postVisibleForOthers" checked>
               <label class="form-check-label" for="flexRadioDefault2">
-                Yes
+                Public
               </label>
             </div>
             <div class="form-check">
               <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" value="false" v-model="postVisibleForOthers">
               <label class="form-check-label" for="flexRadioDefault1">
-                No
+                Private
               </label>
             </div>
             <div class="form-group">

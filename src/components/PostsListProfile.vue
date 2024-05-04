@@ -34,7 +34,7 @@ export default {
       posts: (state) => state.firebase.posts
     })
   },
-  created() {
+  created () {
     this.$store.dispatch(actionTypes.getPostsByUserId, {
       uid: this.uid
     })

@@ -37,11 +37,24 @@
         {{ tag }}
       </small>
     </div>
-    <div class="card-footer text-left">
-      <button v-if="post.data.data.visibleForOthers === true" class="btn btn-outline-primary" @click="viewComments(postId)">Comments</button>
-    </div>
     <div class="position-absolute end-0">
       <DeleteButton v-if="isPostOwner" :postId="postId"></DeleteButton>
+    </div>
+    <div class="d-flex flex-row justify-content-between align-items-center my-3">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-auto align-items-lg-start">
+            <button class="btn"
+                    :class="{'btn-outline-primary': !userHasLiked, 'btn-primary text-dark': userHasLiked}"
+                    @click="toggleLike">
+              <i class="bi bi-suit-heart mx-1"></i>
+            </button>
+          </div>
+          <div class="col-auto">
+            <h6 class="mb-0">{{ postLikes }}</h6>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -51,9 +64,10 @@ import { getAuth } from 'firebase/auth'
 import DeleteButton from './DeleteButton.vue'
 import EditPostButton from './EditPostButton.vue'
 import PostModal from './PostModal.vue'
+import {actionTypes} from "@/store/modules/firebase.js";
 
 export default {
-  name: 'PostCard',
+  name: 'AppPostsView',
   props: {
     post: {
       type: Object,
@@ -62,29 +76,64 @@ export default {
   },
   data() {
     return {
-      auth: getAuth(), // Store the initialized authentication object directly
+      auth: '',
       currentUserId: '',
       postId: this.post.id,
-      postColor: this.post.data.data.color
+      postColor: this.post.data.data.color,
+      postLikes: this.post.data.likes,
+      userHasLiked: false
     }
   },
-  components: { DeleteButton, EditPostButton, PostModal },
+  components: {DeleteButton, EditPostButton, PostModal},
   mounted() {
-    this.auth.onAuthStateChanged((user) => {
+    this.auth = getAuth
+    this.auth().onAuthStateChanged((user) => {
       if (user) {
-        this.currentUserId = user.uid;
+        this.currentUserId = user.uid,
+            this.checkUserLike()
       }
-    });
+    })
   },
+
   computed: {
     isPostOwner() {
-      return this.post.data.uid === this.currentUserId;
+      return this.post.data.uid === this.currentUserId
     }
   },
   methods: {
-    viewComments(postId) {
-      this.$router.push({name: 'comments', params: {postId}});
+    toggleLike() {
+      if (!this.userHasLiked) {
+        this.$store.dispatch(actionTypes.incrementLikes, {
+          postId: this.post.id,
+          userId: this.currentUserId
+        }).then(() => {
+          this.userHasLiked = true;
+          this.postLikes += 1;
+          console.log("Like added successfully.");
+        }).catch(error => {
+          console.error("Error incrementing likes:", error);
+        });
+      } else {
+        this.$store.dispatch(actionTypes.decrementLikes, {
+          postId: this.post.id,
+          userId: this.currentUserId
+        }).then(() => {
+          this.userHasLiked = false;
+          this.postLikes -= 1;
+          console.log("Like removed successfully.");
+        }).catch(error => {
+          console.error("Error decrementing likes:", error);
+        });
+      }
+    },
+    checkUserLike() {
+      this.$store.dispatch(actionTypes.checkUserLike, {
+        postId: this.post.id,
+        userId: this.currentUserId
+      }).then(hasLiked => {
+        this.userHasLiked = hasLiked;
+      });
     }
-  }
+  },
 }
 </script>

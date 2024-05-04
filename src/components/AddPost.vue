@@ -55,7 +55,7 @@
                 <div
                     class="position-absolute top-50 end-0 translate-middle-y d-flex flex-row"
                 >
-                  <i class="bi bi-x-square"></i>
+                    <i class="bi bi-x-square"></i>
                 </div>
               </div>
               <div id="textHelp" class="form-text">
