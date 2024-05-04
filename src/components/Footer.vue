@@ -1,23 +1,38 @@
 <template>
-  <div class="d-flex flex-column">
-    <footer class="text-center text-black mt-auto" style="background-color: #CA8D5A;">
-      <div class="container p-4 pb-0">
-        <section class="">
-          <p class="d-flex justify-content-center align-items-center" v-if="!isLoggedIn">
-            <span class="me-3">Register for free</span>
-            <router-link :to="{ name: 'register' }" class="btn btn-outline-dark me-2">Sign Up!</router-link>
-          </p>
-          <p class="d-flex justify-content-center align-items-center" v-if="isLoggedIn">
-            <span class="me-2">Purr-sue Your Passion – Celebrate Your Feline Friends Daily!</span>
-          </p>
-        </section>
+  <nav class="navbar navbar-expand-lg bg-success sticky-bottom" v-if="isLoggedIn">
+    <div class="container-fluid justify-content-between">
+      <!-- Left elements -->
+      <div class="d-flex">
+        <router-link :to="{ name: 'dashboard' }" class="nav-link" :class="{'active': isLoggedIn, 'disabled': !isLoggedIn}" style="margin-left: 15px;">
+          <i class="bi bi-house-heart-fill display-5"></i>
+        </router-link>
       </div>
-      <div class="text-center p-3" style="background-color: #8F542E;">
-        © 2023 Copyright |
-        <a class="text-black" href="https://uek.krakow.pl/">Cracow University Of Economy</a>
+
+      <!-- Left elements -->
+
+      <!-- Center elements -->
+      <div class="d-flex align-items-center" style="margin-left: 15px;">
+        <button
+            type="button"
+            class="btn btn-success"
+        >
+          <i class="bi bi-plus-circle-fill display-5"></i>
+        </button>
       </div>
-    </footer>
-  </div>
+      <!-- Center elements -->
+
+      <!-- Right elements -->
+      <ul class="navbar-nav flex-row">
+        <li class="nav-item me-3 me-lg-1">
+          <router-link :to="{ name: 'profile' }" style="margin-right: 15px;">
+            <i class="bi bi-person-circle display-5"></i>
+          </router-link>
+        </li>
+      </ul>
+      <!-- Right elements -->
+    </div>
+  </nav>
+  <!-- Navbar -->
 </template>
 
 <script>
@@ -25,6 +40,7 @@ import { getAuth } from 'firebase/auth'
 
 export default {
   name: 'AppFooter',
+  components: {},
   data () {
     return {
       isLoggedIn: '',

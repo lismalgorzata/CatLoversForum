@@ -1,17 +1,15 @@
 <template>
   <PostsListProfileView  v-if="userDetails" :uid="userDetails.uid"></PostsListProfileView >
-  <NewPostButton></NewPostButton>
 </template>
 
 <script>
 import PostsListProfileView from '@/components/PostsListProfile'
-import NewPostButton from '@/components/NewPostButton'
 import { mapActions } from 'vuex'
 import { actionTypes } from '@/store/modules/firebase'
 
 export default {
   name: 'AppUserPosts',
-  components: { PostsListProfileView, NewPostButton },
+  components: { PostsListProfileView },
   data () {
     return {
       userDetails: null

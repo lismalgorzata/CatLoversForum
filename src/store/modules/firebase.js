@@ -3,34 +3,42 @@ import {
     collection,
     getDocs,
     // getDoc,
-    // doc,
+    doc,
     addDoc,
     where,
     query,
-    // deleteDoc,
-    // updateDoc,
+    deleteDoc,
+    updateDoc,
     serverTimestamp,
-    orderBy
-    // orderBy,
+    orderBy,
+    increment
 } from 'firebase/firestore'
 import { db } from '@/main.js'
+import Vue from "core-js/internals/task";
 
 export const actionTypes = {
     getPostsByUserId: '[firedb] getPostsByUserId',
     addPost: '[firedb] addPost',
     updatePassword: '[auth] Update Password',
-    getUserDetails: '[auth] Get User Details'
+    getUserDetails: '[auth] Get User Details',
+    getLikesForPosts: '[firedb] getLikesForPosts',
+    incrementLikes: '[firedb] Increment Likes',
+    decrementLikes: '[firedb] Decrement Likes',
+    checkUserLike: '[firedb] Check User Like'
 }
 
 export const mutationType = {
     setPosts: '[firedb] setPosts',
     addPostSuccess: '[firedb] addPostSuccess',
-    addPostStart: '[firedb] addPostStart'
+    addPostStart: '[firedb] addPostStart',
+    setLikes: '[firedb] setLikes',
+    incrementLikesSuccess: '[firedb] Increment Likes Success'
 }
 
 const state = {
     posts: undefined,
-    isLoading: false
+    isLoading: false,
+    likes: {}
 }
 const mutations = {
     [mutationType.setPosts] (state, payload) {
@@ -42,6 +50,13 @@ const mutations = {
 
     [mutationType.addPostStart] (state) {
         state.isLoading = true
+    },
+    [mutationType.setLikes] (state, payload) {
+        state.likes = payload;
+    },
+    [mutationType.incrementLikesSuccess] (state, { postId, newLikes }) {
+        Vue.set(state.likes, postId, newLikes);
+        console.log(`Likes for post ${postId} incremented successfully to ${newLikes}`);
     }
 }
 
@@ -103,6 +118,86 @@ const actions = {
                 reject('No authenticated user')
             }
         })
+    },
+    [actionTypes.getLikesForPosts] (context) {
+        return new Promise((resolve) => {
+            const q = query(collection(db, 'posts'), orderBy('created', 'desc'));
+
+            getDocs(q).then((result) => {
+                const likes = result.docs.map(doc => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,
+                        likes: data.likes || 0
+                    };
+                });
+                context.commit(mutationType.setLikes, likes);
+                resolve(likes);
+            }).catch(error => {
+                console.error("Error getting likes for posts:", error);
+                resolve([]);
+            });
+        });
+    },
+    [actionTypes.incrementLikes] (context, { postId, userId }) {
+        const postRef = doc(db, 'posts', postId);
+        const userLikesRef = collection(db, 'userLikes');
+
+        return new Promise((resolve, reject) => {
+            updateDoc(postRef, {
+                likes: increment(1)
+            }).then(() => {
+                console.log('Likes incremented successfully.');
+
+                return addDoc(userLikesRef, {
+                    postId: postId,
+                    userId: userId,
+                    date: new Date()
+                });
+            }).then(() => {
+                console.log('User like added successfully.');
+                resolve();
+            }).catch(error => {
+                console.error("Failed to increment likes or add user like:", error);
+                reject(error);
+            });
+        });
+    },
+    [actionTypes.decrementLikes] (context, { postId, userId }) {
+        const postRef = doc(db, 'posts', postId);
+        const userLikesRef = collection(db, 'userLikes');
+        const q = query(userLikesRef, where("postId", "==", postId), where("userId", "==", userId));
+
+        return new Promise((resolve, reject) => {
+            getDocs(q).then(querySnapshot => {
+                querySnapshot.forEach(doc => {
+                    deleteDoc(doc.ref);
+                });
+
+                updateDoc(postRef, {
+                    likes: increment(-1)
+                }).then(() => {
+                    console.log('Likes decremented successfully.');
+                    resolve();
+                }).catch(error => {
+                    console.error("Failed to decrement likes:", error);
+                    reject(error);
+                });
+            }).catch(error => {
+                console.error("Failed to find user like document:", error);
+                reject(error);
+            });
+        });
+    },
+    [actionTypes.checkUserLike] (context, { postId, userId }) {
+        const likesRef = collection(db, 'userLikes');
+        const q = query(likesRef, where("postId", "==", postId), where("userId", "==", userId));
+        return getDocs(q).then(querySnapshot => {
+            return querySnapshot.size > 0;
+        }).catch(error => {
+            console.error("Failed to check user likes:", error);
+            return false;
+        });
     },
     [actionTypes.getUserDetails] () {
         return new Promise((resolve, reject) => {

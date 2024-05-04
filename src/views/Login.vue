@@ -1,5 +1,5 @@
 <template>
-  <section class="vh-100-flexible scrollable-section" style="background-color: white;">
+  <section class="vh-100 scrollable-section" style="background-color: white;">
     <div class="container py-5 h-100">
       <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col col-xl-10">
@@ -151,8 +151,5 @@ export default {
   height: 100vh;
   object-fit: cover;
   border-radius: 1rem 0 0 1rem;
-}
-.vh-100-flexible {
-  min-height: 100vh;
 }
 </style>
