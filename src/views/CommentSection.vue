@@ -11,7 +11,11 @@
       </form>
       <!-- Display comments -->
       <div v-for="comment in comments" :key="comment.id">
-        <p>{{ comment.content }}</p>
+        <div>
+          <p>{{ comment.data.text }}</p> <!-- Access the 'text' field from 'data' -->
+          <small>Posted by: {{ comment.data.uid }} at {{ new Date(comment.data.created.seconds * 1000).toLocaleString() }}</small>
+          <!-- Format the 'created' timestamp into a readable date -->
+        </div>
       </div>
     </div>
     <div v-else>
@@ -22,23 +26,18 @@
 
 <script>
 import { mapActions, mapState } from 'vuex';
-import Post from '@/components/Post.vue'; 
-import { actionTypes } from '@/store/modules/firebase'
+import Post from '@/components/Post.vue';
+import { actionTypes } from '@/store/modules/firebase';
 
 export default {
   components: {
     Post
   },
-  props: ['postId'], 
-  data() {
-    return {
-      newComment: '',
-      comments: [] 
-    };
-  },
+  props: ['postId'],
   computed: {
     ...mapState({
-      posts: (state) => state.firebase.posts 
+      posts: (state) => state.firebase.posts,
+      comments: (state) => state.firebase.comments // Ensuring the comments are mapped from Vuex state
     }),
     post() {
       // Ensures post exists and matches the ID from the route
@@ -50,8 +49,8 @@ export default {
   },
   methods: {
     ...mapActions({
-      addCommentToFirestore: actionTypes.addComment, // Use the constant from actionTypes
-      fetchComments: actionTypes.fetchComments 
+      addCommentToFirestore: actionTypes.addComment,
+      fetchComments: actionTypes.fetchComments // Ensuring this action is properly defined and called
     }),
     addComment() {
       if (this.newComment.trim()) {
@@ -59,12 +58,12 @@ export default {
           postId: this.$route.params.postId,
           comment: this.newComment
         }).then(() => {
-          this.newComment = ''; 
-          this.fetchComments(this.$route.params.postId); 
-          alert('Comment added successfully!'); 
+          this.newComment = '';
+          this.fetchComments(this.$route.params.postId); // Refresh comments list
+          alert('Comment added successfully!');
         }).catch(error => {
           console.error('Failed to add comment:', error);
-          alert('Failed to add comment. Please try again.'); 
+          alert('Failed to add comment. Please try again.');
         });
       }
     }
