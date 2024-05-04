@@ -1,11 +1,12 @@
 <template>
   <div
-      v-for="post in posts"
-      :key="post.id"
-      class=""
-      style="width: 100%; max-width: 50rem"
+    v-for="post in posts"
+    :key="post.id"
+    class=""
+    style="width: 100%; max-width: 50rem"
   >
-    <Post v-if="post.data.data.visibleForOthers == true" :post="post"></Post>
+    <Post v-if="post.data.data.visibleForOthers === true" :post="post"></Post>
+    <button v-if="post.data.data.visibleForOthers === true" @click="viewComments(post.id)">Comments</button>
   </div>
 </template>
 
@@ -21,7 +22,6 @@ export default {
       type: String,
       required: false
     },
-
     onlyMyPosts: {
       type: Boolean,
       required: false
@@ -34,6 +34,11 @@ export default {
     ...mapState({
       posts: (state) => state.firebase.posts
     })
+  },
+  methods: {
+    viewComments(postId) {
+      this.$router.push({ name: 'comments', params: { postId } });
+    }
   },
   mounted () {
     this.$store.dispatch(actionTypes.getPostsByUserId, {
