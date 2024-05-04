@@ -4,6 +4,7 @@ import Login from '@/views/Login'
 import Register from '@/views/Register'
 import Dashboard from '@/views/Dashboard'
 import Profile from '@/views/Profile'
+import CommentSection from '@/views/CommentSection' // Import the CommentSection component
 import { getAuth } from 'firebase/auth'
 
 const routes = [
@@ -36,6 +37,15 @@ const routes = [
     component: Profile,
     meta: {
       requiresAuth: true
+    }
+  },
+  {
+    path: '/comments/:postId', // Dynamic path for comments
+    name: 'comments',
+    component: CommentSection,
+    props: true,
+    meta: {
+      requiresAuth: true // Assuming you want this route to also be protected
     }
   }
 ]
