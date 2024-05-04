@@ -101,11 +101,6 @@ export default {
     }
   },
   methods: {
-    viewComments(postId) {
-      this.$router.push({ name: 'comments', params: { postId } });
-    }
-  },
-  methods: {
     toggleLike() {
       if (!this.userHasLiked) {
         this.$store.dispatch(actionTypes.incrementLikes, {
@@ -138,7 +133,10 @@ export default {
       }).then(hasLiked => {
         this.userHasLiked = hasLiked;
       });
-    }
+    },
+    viewComments(postId) {
+      this.$router.push({ name: 'comments', params: { postId } });
+    },
   },
 }
 </script>
