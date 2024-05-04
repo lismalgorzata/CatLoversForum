@@ -13,8 +13,12 @@
       <div v-for="comment in comments" :key="comment.id">
         <div>
           <p>{{ comment.data.text }}</p> <!-- Access the 'text' field from 'data' -->
-          <small>Posted by: {{ comment.data.uid }} at {{ new Date(comment.data.created.seconds * 1000).toLocaleString() }}</small>
-          <!-- Format the 'created' timestamp into a readable date -->
+          <small v-if="comment.data.created"> <!-- Check if created is not null -->
+            Posted by: {{ comment.data.uid }} at {{ new Date(comment.data.created.seconds * 1000).toLocaleString() }}
+          </small>
+          <small v-else> <!-- Fallback if created is null -->
+            Posted by: {{ comment.data.uid }}
+          </small>
         </div>
       </div>
     </div>

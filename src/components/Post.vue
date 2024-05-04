@@ -37,6 +37,9 @@
         {{ tag }}
       </small>
     </div>
+    <div class="card-footer text-left">
+      <button v-if="post.data.data.visibleForOthers === true" class="btn btn-outline-primary" @click="viewComments(postId)">Comments</button>
+    </div>
     <div class="position-absolute end-0">
       <DeleteButton v-if="isPostOwner" :postId="postId"></DeleteButton>
     </div>
@@ -50,34 +53,37 @@ import EditPostButton from './EditPostButton.vue'
 import PostModal from './PostModal.vue'
 
 export default {
-  name: 'AppPostsView',
+  name: 'PostCard',
   props: {
     post: {
       type: Object,
       required: true
     }
   },
-  data () {
+  data() {
     return {
-      auth: '',
+      auth: getAuth(), // Store the initialized authentication object directly
       currentUserId: '',
       postId: this.post.id,
       postColor: this.post.data.data.color
     }
   },
   components: { DeleteButton, EditPostButton, PostModal },
-  mounted () {
-    this.auth = getAuth
-    this.auth().onAuthStateChanged((user) => {
+  mounted() {
+    this.auth.onAuthStateChanged((user) => {
       if (user) {
-        this.currentUserId = user.uid
+        this.currentUserId = user.uid;
       }
-    })
+    });
   },
-
   computed: {
-    isPostOwner () {
-      return this.post.data.uid === this.currentUserId
+    isPostOwner() {
+      return this.post.data.uid === this.currentUserId;
+    }
+  },
+  methods: {
+    viewComments(postId) {
+      this.$router.push({ name: 'comments', params: { postId } });
     }
   }
 }
