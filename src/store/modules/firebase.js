@@ -1,4 +1,4 @@
-import { getAuth, onAuthStateChanged, updatePassword } from 'firebase/auth'
+import { getAuth, onAuthStateChanged, updatePassword } from 'firebase/auth';
 import {
     collection,
     getDocs,
@@ -19,6 +19,7 @@ import Vue from "core-js/internals/task";
 export const actionTypes = {
     getPostsByUserId: '[firedb] getPostsByUserId',
     addPost: '[firedb] addPost',
+    addComment: '[firedb] addComment', // New action type for adding comments
     updatePassword: '[auth] Update Password',
     getUserDetails: '[auth] Get User Details',
     getLikesForPosts: '[firedb] getLikesForPosts',
@@ -42,12 +43,14 @@ const state = {
 }
 const mutations = {
     [mutationType.setPosts] (state, payload) {
-        state.posts = payload
+        state.posts = payload;
     },
     [mutationType.addPostSuccess] (state) {
-        state.isLoading = false
+        state.isLoading = false;
     },
-
+    [mutationType.addCommentSuccess] (state) { // Handles the state change on comment addition
+        state.isLoading = false; // You can modify this as needed
+    },
     [mutationType.addPostStart] (state) {
         state.isLoading = true
     },
@@ -58,66 +61,60 @@ const mutations = {
         Vue.set(state.likes, postId, newLikes);
         console.log(`Likes for post ${postId} incremented successfully to ${newLikes}`);
     }
-}
+};
 
 const actions = {
     [actionTypes.getPostsByUserId] (context, { uid }) {
-        return new Promise((resolve) => {
-            context.commit(mutationType.addPostStart)
-            let q = query(collection(db, 'posts'), orderBy('created', 'desc'))
-            if (uid) {
-                q = query(
-                    collection(db, 'posts'),
-                    where('uid', '==', uid),
-                    orderBy('created', 'desc')
-                )
-            }
-
-            getDocs(q).then((result) => {
-                const posts = result.docs.map((doc) => {
-                    doc.data()
-                    return {
-                        id: doc.id,
-                        data: doc.data()
-                    }
-                })
-                context.commit(mutationType.setPosts, posts)
-                resolve()
-            })
-        })
+        context.commit(mutationType.addPostStart);
+        const q = uid ? query(collection(db, 'posts'), where('uid', '==', uid), orderBy('created', 'desc')) : query(collection(db, 'posts'), orderBy('created', 'desc'));
+        getDocs(q).then((result) => {
+            const posts = result.docs.map((doc) => ({
+                id: doc.id,
+                data: doc.data()
+            }));
+            context.commit(mutationType.setPosts, posts);
+        });
     },
     [actionTypes.addPost] (context, data) {
-        return new Promise((resolve) => {
-            const auth = getAuth()
-            onAuthStateChanged(auth, (user) => {
+        const auth = getAuth();
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
                 addDoc(collection(db, 'posts'), {
                     data,
                     uid: user.uid,
                     created: serverTimestamp()
-                })
-                context.commit(mutationType.addPostSuccess)
-                resolve()
-            })
-        })
-    },
-
-    [actionTypes.updatePassword] (context, { newPassword }) {
-        return new Promise((resolve, reject) => {
-            const auth = getAuth()
-            const user = auth.currentUser
-            if (user) {
-                updatePassword(user, newPassword)
-                    .then(() => {
-                        resolve('Password updated successfully')
-                    })
-                    .catch((error) => {
-                        reject(error)
-                    })
-            } else {
-                // eslint-disable-next-line prefer-promise-reject-errors
-                reject('No authenticated user')
+                }).then(() => {
+                    context.commit(mutationType.addPostSuccess);
+                });
             }
-        })
+        });
+    },
+    [actionTypes.addComment] (context, { postId, comment }) { // New action to add a comment
+        console.log("addCommentIsFiring");
+        const commentRef = collection(db, "comments", postId, "userComments");
+        const auth = getAuth();
+        if (auth.currentUser) {
+            addDoc(commentRef, {
+                text: comment,
+                created: serverTimestamp(),
+                uid: auth.currentUser.uid
+            }).then(() => {
+                context.commit(mutationType.addCommentSuccess);
+            }).catch(error => {
+                console.error("Error adding comment:", error);
+            });
+        }
+    },
+    [actionTypes.updatePassword] (context, { newPassword }) {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (user) {
+            updatePassword(user, newPassword).then(() => {
+                context.commit('Password updated successfully');
+            }).catch((error) => {
+                console.error('Error updating password:', error);
+            });
+        }
     },
     [actionTypes.getLikesForPosts] (context) {
         return new Promise((resolve) => {
@@ -219,9 +216,10 @@ const actions = {
             }
         })
     }
-}
+};
+
 export default {
     actions,
     mutations,
     state
-}
+};
