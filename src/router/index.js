@@ -4,6 +4,8 @@ import Login from '@/views/Login'
 import Register from '@/views/Register'
 import Dashboard from '@/views/Dashboard'
 import Profile from '@/views/Profile'
+import AddPost from '@/components/AddPost'
+
 import { getAuth } from 'firebase/auth'
 
 const routes = [
@@ -37,6 +39,14 @@ const routes = [
     meta: {
       requiresAuth: true
     }
+  },
+  {
+    path: '/add-post',
+    name: 'addPost',
+    component: AddPost,
+    meta: {
+      requiresAuth: true
+    }
   }
 ]
 
@@ -49,10 +59,9 @@ export const getCurrentUser = () => {
   })
 }
 
-// eslint-disable-next-line new-cap
-const router = new createRouter({
-  routes,
-  history: createWebHistory()
+const router = createRouter({
+  history: createWebHistory(),
+  routes
 })
 
 router.beforeEach(async (to, from, next) => {

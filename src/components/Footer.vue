@@ -12,12 +12,9 @@
 
       <!-- Center elements -->
       <div class="d-flex align-items-center" style="margin-left: 15px;">
-        <button
-            type="button"
-            class="btn btn-success"
-        >
+        <router-link :to="{ name: 'addPost' }" class="nav-link" :class="{'active': isLoggedIn, 'disabled': !isLoggedIn}">
           <i class="bi bi-plus-circle-fill display-5"></i>
-        </button>
+        </router-link>
       </div>
       <!-- Center elements -->
 

@@ -5,7 +5,7 @@
       class=""
       style="width: 100%; max-width: 50rem"
   >
-    <Post v-if="post.data.data.visibleForOthers == true" :post="post"></Post>
+    <Post v-if="post.data.data.visibleForOthers === true" :post="post"></Post>
   </div>
 </template>
 
@@ -21,7 +21,6 @@ export default {
       type: String,
       required: false
     },
-
     onlyMyPosts: {
       type: Boolean,
       required: false
@@ -35,7 +34,7 @@ export default {
       posts: (state) => state.firebase.posts
     })
   },
-  mounted () {
+  mounted() {
     this.$store.dispatch(actionTypes.getPostsByUserId, {
       uid: this.uid
     })
