@@ -92,13 +92,16 @@ const actions = {
         }
     },
     [actionTypes.fetchComments]: async (context, postId) => {
-        console.log("fetchComments is firing");
-        const commentsQuery = query(collection(db, "comments"), where("postId", "==", postId));
+        console.log("fetchComments is firing for post ID:", postId);
+        // Adjusted to fetch from the subcollection "userComments" under the specific post document
+        const commentsRef = collection(db, "comments", postId, "userComments");
+        const commentsQuery = query(commentsRef, orderBy("created", "desc")); // Optionally ordering by created timestamp
         try {
             const querySnapshot = await getDocs(commentsQuery);
             const comments = querySnapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
-            context.commit('setComments', comments); 
+            context.commit('setComments', comments);
             console.log("Comments fetched successfully", comments);
+            return comments;
         } catch (error) {
             console.error("Error fetching comments:", error);
         }
