@@ -16,7 +16,8 @@ export const actionTypes = {
     addComment: '[firedb] addComment', 
     updatePassword: '[auth] Update Password',
     getUserDetails: '[auth] Get User Details',
-    fetchComments: '[firedb] fetchComments'
+    fetchComments: '[firedb] fetchComments',
+    fetchPosts: '[firedb] fetchPosts'
 };
 
 export const mutationType = {
@@ -46,7 +47,7 @@ const mutations = {
     },
     [mutationType.addPostStart] (state) {
         state.isLoading = true;
-    }
+    },
 };
 
 const actions = {
@@ -104,6 +105,21 @@ const actions = {
             return comments;
         } catch (error) {
             console.error("Error fetching comments:", error);
+        }
+    },
+    [actionTypes.fetchPosts]: async (context) => {  // New fetchPosts action
+        const postsQuery = query(collection(db, 'posts'), orderBy('created', 'desc'));
+        try {
+            const querySnapshot = await getDocs(postsQuery);
+            const posts = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                data: doc.data()
+            }));
+            context.commit(mutationType.setPosts, posts);
+            console.log("Posts fetched successfully", posts);
+            return posts;
+        } catch (error) {
+            console.error("Error fetching posts:", error);
         }
     },
     [actionTypes.updatePassword] (context, { newPassword }) {
