@@ -13,8 +13,10 @@ import {
     orderBy,
     increment
 } from 'firebase/firestore'
-import { db } from '@/main.js'
+import {db, storage} from '@/main.js'
 import Vue from "core-js/internals/task";
+import {ref} from "vue";
+import {getDownloadURL} from "firebase/storage";
 
 export const actionTypes = {
     getPostsByUserId: '[firedb] getPostsByUserId',
@@ -29,6 +31,8 @@ export const actionTypes = {
     decrementLikes: '[firedb] Decrement Likes',
     checkUserLike: '[firedb] Check User Like',
     addImage: '[firedb] addImage',
+    loadImage: '[firedb] loadImage',
+
 };
 
 export const mutationType = {
@@ -298,6 +302,37 @@ const actions = {
                     console.error("Error adding photo:", error);
                     reject(error);
                 });
+        });
+    },
+    [actionTypes.loadImage](context, { referenceId }) {
+        // eslint-disable-next-line no-async-promise-executor
+        return new Promise(async (resolve, reject) => {
+            try {
+                // Query the `images` collection where `referenceId` matches the given `postId`
+                const q = query(collection(db, 'images'), where('referenceId', '==', referenceId));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    reject(`No image found for reference ID: ${referenceId}`);
+                    return;
+                }
+
+                // Assume there's only one image for each post and get the first document
+                const imageDoc = querySnapshot.docs[0].data();
+
+                // Extract the image name to create the full path in storage
+                const imagePath = `images/${imageDoc.name}`;
+
+                // Retrieve the download URL from storage
+                const storageRef = ref(storage, imagePath);
+                const downloadUrl = await getDownloadURL(storageRef);
+
+                // Resolve with the download URL
+                resolve({ url: downloadUrl, ...imageDoc });
+            } catch (error) {
+                console.error("Error loading image:", error);
+                reject(error);
+            }
         });
     },
     [actionTypes.getUserDetails] () {

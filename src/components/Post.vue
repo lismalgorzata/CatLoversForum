@@ -27,6 +27,9 @@
         ></EditPostButton>
       </div>
       <p class="card-text">{{ post.data.data.content }}</p>
+      <div>
+        <img v-if="imageUrl" :src="imageUrl" alt="Uploaded Image" style="max-width: 60%; height: auto; margin-bottom: 20px;" />
+      </div>
     </div>
     <div class="position-absolute end-0">
       <DeleteButton v-if="isPostOwner" :postId="postId"></DeleteButton>
@@ -74,7 +77,8 @@ export default {
       currentUserId: '',
       postId: this.post.id,
       postLikes: this.post.data.likes || 0,
-      userHasLiked: false
+      userHasLiked: false,
+      imageUrl: '',
     }
   },
   components: { DeleteButton, EditPostButton, PostModal },
@@ -131,6 +135,16 @@ export default {
     viewComments(postId) {
       this.$router.push({ name: 'comments', params: { postId } });
     },
+    loadImageForPost(postId) {
+      this.$store.dispatch(actionTypes.loadImage, { referenceId: postId })
+          .then((image) => {
+            console.log("Loaded image:", image);
+            this.imageUrl = image.url;
+          })
+          .catch((error) => {
+            console.error("Error loading image for post:", error);
+          });
+    }
   },
 }
 </script>
