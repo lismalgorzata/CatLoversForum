@@ -1,24 +1,26 @@
 <template>
-  <div>
+  <div class="container mt-5">
     <h1>Comments</h1>
-    <div v-if="post">
+    <div v-if="post" class="mt-3">
       <!-- Display the post -->
       <Post :post="post" />
       <!-- Comment form -->
-      <form @submit.prevent="addComment">
-        <textarea v-model="newComment" placeholder="Add a comment..."></textarea>
-        <button type="submit">Post Comment</button>
+      <form @submit.prevent="addComment" class="d-flex mt-4">
+        <textarea v-model="newComment" placeholder="Add a comment..." class="form-control me-3" rows="1" style="resize: none;"></textarea>
+        <button type="submit" class="btn btn-primary">Post Comment</button>
       </form>
       <!-- Display comments -->
-      <div v-for="comment in comments" :key="comment.id">
-        <div>
-          <p>{{ comment.data.text }}</p> <!-- Access the 'text' field from 'data' -->
-          <small v-if="comment.data.created"> <!-- Check if created is not null -->
-            Posted by: {{ comment.data.uid }} at {{ new Date(comment.data.created.seconds * 1000).toLocaleString() }}
-          </small>
-          <small v-else> <!-- Fallback if created is null -->
-            Posted by: {{ comment.data.uid }}
-          </small>
+      <div v-for="comment in comments" :key="comment.id" class="mt-4">
+        <div class="card">
+          <div class="card-body">
+            <p class="card-text">{{ comment.data.text }}</p> 
+            <small v-if="comment.data.created"> 
+              Posted by: {{ comment.data.uid }} at {{ new Date(comment.data.created.seconds * 1000).toLocaleString() }}
+            </small>
+            <small v-else> 
+              Posted by: {{ comment.data.uid }}
+            </small>
+          </div>
         </div>
       </div>
     </div>
@@ -41,16 +43,15 @@ export default {
   computed: {
     ...mapState({
       posts: (state) => state.firebase.posts,
-      comments: (state) => state.firebase.comments // Ensuring the comments are mapped from Vuex state
+      comments: (state) => state.firebase.comments 
     }),
     post() {
-      // Ensures post exists and matches the ID from the route
       return this.posts?.find(post => post.id === this.$route.params.postId);
     }
   },
   created() {
     if (!this.posts) {
-      this.fetchData();  // Assuming this action is defined and does what is intended
+      this.fetchData();  
     }
     this.fetchComments(this.$route.params.postId);
   },
@@ -67,8 +68,7 @@ export default {
           comment: this.newComment
         }).then(() => {
           this.newComment = '';
-          this.fetchComments(this.$route.params.postId); // Refresh comments list
-          alert('Comment added successfully!');
+          this.fetchComments(this.$route.params.postId); 
         }).catch(error => {
           console.error('Failed to add comment:', error);
           alert('Failed to add comment. Please try again.');
