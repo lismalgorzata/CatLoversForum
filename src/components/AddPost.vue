@@ -101,6 +101,7 @@ export default {
     return {
       postTitle: ref(''),
       postContent: '',
+      postVisibleForOthers: 'true',
       audioContext: new (window.AudioContext || window.webkitAudioContext)(),
     };
   },
@@ -129,7 +130,7 @@ export default {
             )
             .then(async () => {
               this.playSound();
-              await new Promise((resolve) => setTimeout(resolve, 500))
+              await new Promise((resolve) => setTimeout(resolve, 2000))
               this.$router.go()
             })
       }
