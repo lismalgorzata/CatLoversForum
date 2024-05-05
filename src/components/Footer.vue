@@ -12,12 +12,7 @@
 
       <!-- Center elements -->
       <div class="d-flex align-items-center" style="margin-left: 15px;">
-        <button
-            type="button"
-            class="btn btn-success"
-        >
-          <i class="bi bi-plus-circle-fill display-5"></i>
-        </button>
+        <AddPost></AddPost>
       </div>
       <!-- Center elements -->
 
@@ -37,10 +32,11 @@
 
 <script>
 import { getAuth } from 'firebase/auth'
+import AddPost from "@/components/AddPost";
 
 export default {
   name: 'AppFooter',
-  components: {},
+  components: { AddPost },
   data () {
     return {
       isLoggedIn: '',

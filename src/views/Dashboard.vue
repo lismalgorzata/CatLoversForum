@@ -5,12 +5,23 @@
       <PostsList :uid="''"></PostsList>
     </div>
   </div>
+  <div class="container justify-content-center addPost">
+    Add your post right now:
+    <AddPost></AddPost>
+  </div>
 </template>
 
 <script>
 import PostsList from '@/components/PostsList.vue'
+import AddPost from "@/components/AddPost";
 export default {
   name: 'AppDashboardView',
-  components: { PostsList }
+  components: { PostsList, AddPost }
 }
 </script>
+<style>
+.addPost {
+  width: 10%;
+  height: 10%;
+}
+</style>

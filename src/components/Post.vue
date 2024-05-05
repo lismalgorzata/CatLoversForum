@@ -28,15 +28,6 @@
       </div>
       <p class="card-text">{{ post.data.data.content }}</p>
     </div>
-    <div class="d-flex flex-row p-2">
-      <small
-          v-for="(tag, index) in post.data.data.tags"
-          :key="index"
-          class="p-1 fw-bold text-white me-2 mt-2 badge bg-success border"
-      >
-        {{ tag }}
-      </small>
-    </div>
     <div class="position-absolute end-0">
       <DeleteButton v-if="isPostOwner" :postId="postId"></DeleteButton>
     </div>
@@ -65,7 +56,7 @@
 <script>
 import { getAuth } from 'firebase/auth'
 import DeleteButton from './DeleteButton.vue'
-import EditPostButton from './EditPostButton.vue'
+import EditPostButton from './EditPost.vue'
 import PostModal from './PostModal.vue'
 import {actionTypes} from "@/store/modules/firebase.js";
 
@@ -82,8 +73,7 @@ export default {
       auth: getAuth(), // Store the initialized authentication object directly
       currentUserId: '',
       postId: this.post.id,
-      postColor: this.post.data.data.color,
-      postLikes: this.post.data.likes,
+      postLikes: this.post.data.likes || 0,
       userHasLiked: false
     }
   },
@@ -91,7 +81,8 @@ export default {
   mounted() {
     this.auth.onAuthStateChanged((user) => {
       if (user) {
-        this.currentUserId = user.uid;
+        this.currentUserId = user.uid,
+        this.checkUserLike()
       }
     });
   },

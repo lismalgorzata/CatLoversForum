@@ -71,53 +71,6 @@
                   Private
                 </label>
               </div>
-              <div class="form-group">
-                <label for="exampleFormSelect">Post color </label>
-                <select class="form-select" id="selectColor" disabled v-model="postColor">
-                  <option value="text-bg-white">White</option>
-                  <option value="text-bg-primary">Light Brown</option>
-                  <option value="text-bg-secondary">Dark Brown</option>
-                  <option value="text-bg-warning">Light Sea</option>
-                </select>
-              </div>
-              <div class="pt-3 pb-3">
-                <div class="form-check form-check-inline">
-                  <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="checkbox1"
-                      value="School"
-                      v-model="isSchool"
-                  />
-                  <label class="form-check-label" for="inlineCheckbox1"
-                  >School</label
-                  >
-                </div>
-                <div class="form-check form-check-inline">
-                  <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="checkbox2"
-                      value="Work"
-                      v-model="isWork"
-                  />
-                  <label class="form-check-label" for="inlineCheckbox2"
-                  >Work</label
-                  >
-                </div>
-                <div class="form-check form-check-inline">
-                  <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="checkbox3"
-                      value="Personal"
-                      v-model="isPersonal"
-                  />
-                  <label class="form-check-label" for="inlineCheckbox3"
-                  >Personal</label
-                  >
-                </div>
-              </div>
             </div>
             <div>
               <button
@@ -139,7 +92,7 @@ import { doc, updateDoc, getDoc } from 'firebase/firestore'
 import { db } from '@/main.js'
 
 export default {
-  name: 'EditPostButton',
+  name: 'EditPost',
   props: {
     postData: {
       type: Object,
@@ -154,10 +107,6 @@ export default {
     return {
       postTitle: this.postData.title,
       postContent: this.postData.content,
-      isSchool: this.postData.tags.includes('School'),
-      isWork: this.postData.tags.includes('Work'),
-      isPersonal: this.postData.tags.includes('Personal'),
-      postColor: this.postData.color,
       postVisibleForOthers: this.postData.visibleForOthers
     }
   },
@@ -173,13 +122,7 @@ export default {
         data: {
           title: this.postTitle,
           content: this.postContent,
-          color: this.postColor,
-          visibleForOthers: this.postVisibleForOthers === 'true',
-          tags: [
-            this.isSchool ? 'School' : null,
-            this.isWork ? 'Work' : null,
-            this.isPersonal ? 'Personal' : null
-          ].filter((tag) => tag !== null)
+          visibleForOthers: this.postVisibleForOthers === 'true'
         }
       }
       updateDoc(docRef, updatedData)

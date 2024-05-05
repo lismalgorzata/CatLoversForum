@@ -1,11 +1,11 @@
 <template>
   <button
       type="button"
-      class="btn btn-primary"
+      class="btn btn-success"
       data-bs-toggle="modal"
       data-bs-target="#exampleModal"
   >
-    Add post
+    <i class="bi bi-plus-circle-fill display-5"></i>
   </button>
 
   <div
@@ -16,7 +16,7 @@
       aria-hidden="true"
   >
     <div class="modal-dialog">
-      <div class="modal-content">
+      <div v-bind:class="{'modal-content': true, [postColor]: true}">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="exampleModalLabel">New post</h1>
           <button
@@ -39,31 +39,9 @@
                   v-model="postTitle"
                   required
               />
-              <div
-                  class="d-flex flex-row position-relative"
-              >
-                <input
-                    type="text"
-                    class="form-control"
-                    id="titleInput"
-                    maxlength="60"
-                    aria-describedby="textHelp"
-                    disabled
-                    required
-                    @click="test"
-                />
-                <div
-                    class="position-absolute top-50 end-0 translate-middle-y d-flex flex-row"
-                >
-                    <i class="bi bi-x-square"></i>
-                </div>
-              </div>
-              <div id="textHelp" class="form-text">
-                Type title of your new post
-              </div>
             </div>
             <div class="form-group">
-              <label for="exampleFormControlTextarea1">Content</label>
+              <label for="exampleFormControlTextarea1">Post content</label>
               <textarea
                   class="form-control"
                   id="exampleFormControlTextarea1"
@@ -77,47 +55,24 @@
             <small id="textAreaHelpblock" class="form-text text-muted">
               {{ postContent.length }}/255
             </small>
-            <div class="pt-3 pb-3">
-              <div class="form-check form-check-inline">
-                <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="checkbox1"
-                    value="School"
-                    v-model="checkedTags"
-                />
-                <label class="form-check-label" for="inlineCheckbox1"
-                >School</label
-                >
-              </div>
-              <div class="form-check form-check-inline">
-                <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="checkbox2"
-                    value="Work"
-                    v-model="checkedTags"
-                />
-                <label class="form-check-label" for="inlineCheckbox2"
-                >Work</label
-                >
-              </div>
-              <div class="form-check form-check-inline">
-                <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="checkbox3"
-                    value="Personal"
-                    v-model="checkedTags"
-                />
-                <label class="form-check-label" for="inlineCheckbox3"
-                >Personal</label
-                >
-              </div>
+            <div>
+              Visibility
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" value="true" v-model="postVisibleForOthers" checked>
+              <label class="form-check-label" for="flexRadioDefault2">
+                Public
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" value="false" v-model="postVisibleForOthers">
+              <label class="form-check-label" for="flexRadioDefault1">
+                Private
+              </label>
             </div>
             <div>
               <button
-                  class="btn btn-primary p-1 m-1 text-white"
+                  class="btn btn-success p-1 m-1 text-white"
                   @click="submit"
               >
                 Submit
@@ -133,17 +88,19 @@
 import { actionTypes } from "@/store/modules/firebase";
 import { ref } from "vue";
 import meowSound from '@/assets/cat-meow.wav';
+import {mapState} from "vuex";
 
 export default {
   name: "AddPost",
-  data() {
+  computed: {
+    ...mapState({
+      isLoading: (state) => state.firebase.isLoading
+    })
+  },
+  data () {
     return {
-      postTitle: ref(""),
-      postContent: "",
-      isSchool: false,
-      isWork: false,
-      isPersonal: false,
-      checkedTags: ref([]),
+      postTitle: ref(''),
+      postContent: '',
       audioContext: new (window.AudioContext || window.webkitAudioContext)(),
     };
   },
@@ -165,20 +122,19 @@ export default {
       if (this.postTitle.length > 0 && this.postContent.length > 0) {
         this.$store
             .dispatch(actionTypes.addPost, {
-              title: this.postTitle,
-              content: this.postContent,
-              tags: this.checkedTags,
-            })
+                  title: this.postTitle,
+                  content: this.postContent,
+                  visibleForOthers: this.postVisibleForOthers === 'true'
+                }
+            )
             .then(async () => {
               this.playSound();
-              await new Promise((resolve) => setTimeout(resolve, 2000));
-              this.$router.go();
-            });
+              await new Promise((resolve) => setTimeout(resolve, 500))
+              this.$router.go()
+            })
       }
     },
-    test() {
-      console.log("test");
-    },
   },
-};
+  components: { }
+}
 </script>
