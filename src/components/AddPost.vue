@@ -55,27 +55,25 @@
             <small id="textAreaHelpblock" class="form-text text-muted">
               {{ postContent.length }}/255
             </small>
-            <div>
-              Visibility
+            <div class="visibility-select-container d-flex align-items-center">
+              <i v-if="postVisibleForOthers === 'true'" class="bi bi-globe-europe-africa select-icon"></i>
+              <i v-else class="bi bi-lock-fill select-icon"></i>
+              <select
+                  id="visibilitySelect"
+                  class="form-control ms-2"
+                  v-model="postVisibleForOthers"
+              >
+                <option value="true">Public</option>
+                <option value="false">Private</option>
+              </select>
             </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" value="true" v-model="postVisibleForOthers" checked>
-              <label class="form-check-label" for="flexRadioDefault2">
-                Public
-              </label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" value="false" v-model="postVisibleForOthers">
-              <label class="form-check-label" for="flexRadioDefault1">
-                Private
-              </label>
-            </div>
+            <UploadImage></UploadImage>
             <div>
               <button
                   class="btn btn-success p-1 m-1 text-white"
                   @click="submit"
               >
-                Submit
+                Add Post
               </button>
             </div>
           </form>
@@ -89,6 +87,7 @@ import { actionTypes } from "@/store/modules/firebase";
 import { ref } from "vue";
 import meowSound from '@/assets/cat-meow.wav';
 import {mapState} from "vuex";
+import UploadImage from "@/components/UploadImage";
 
 export default {
   name: "AddPost",
@@ -136,6 +135,6 @@ export default {
       }
     },
   },
-  components: { }
+  components: { UploadImage }
 }
 </script>

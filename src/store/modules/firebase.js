@@ -19,7 +19,7 @@ import Vue from "core-js/internals/task";
 export const actionTypes = {
     getPostsByUserId: '[firedb] getPostsByUserId',
     addPost: '[firedb] addPost',
-    addComment: '[firedb] addComment', 
+    addComment: '[firedb] addComment',
     updatePassword: '[auth] Update Password',
     getUserDetails: '[auth] Get User Details',
     fetchComments: '[firedb] fetchComments',
@@ -27,13 +27,14 @@ export const actionTypes = {
     getLikesForPosts: '[firedb] getLikesForPosts',
     incrementLikes: '[firedb] Increment Likes',
     decrementLikes: '[firedb] Decrement Likes',
-    checkUserLike: '[firedb] Check User Like'
+    checkUserLike: '[firedb] Check User Like',
+    addPhoto: '[firedb] addPhoto',
 };
 
 export const mutationType = {
     setPosts: '[firedb] setPosts',
     addPostSuccess: '[firedb] addPostSuccess',
-    addCommentSuccess: '[firedb] addCommentSuccess', 
+    addCommentSuccess: '[firedb] addCommentSuccess',
     addPostStart: '[firedb] addPostStart',
     setLikes: '[firedb] setLikes',
     incrementLikesSuccess: '[firedb] Increment Likes Success'
@@ -52,7 +53,7 @@ const mutations = {
     [mutationType.addPostSuccess] (state) {
         state.isLoading = false;
     },
-    [mutationType.addCommentSuccess] (state) { 
+    [mutationType.addCommentSuccess] (state) {
         state.isLoading = false;
     },
     setComments(state, comments) {
@@ -110,7 +111,7 @@ const actions = {
             })
         })
     },
-    [actionTypes.addComment] (context, { postId, comment }) { 
+    [actionTypes.addComment] (context, { postId, comment }) {
         console.log("addCommentIsFiring");
         const commentRef = collection(db, "comments", postId, "userComments");
         const auth = getAuth();
@@ -252,6 +253,22 @@ const actions = {
         }).catch(error => {
             console.error("Failed to check user likes:", error);
             return false;
+        });
+    },
+    [actionTypes.addPhoto](context, { name, url, referenceId }) {
+        return new Promise((resolve, reject) => {
+            addDoc(collection(db, 'photos'), {
+                name: name,
+                url: url,
+                referenceId: referenceId,
+                created: serverTimestamp()
+            }).then(() => {
+                console.log('Photo added successfully.');
+                resolve();
+            }).catch(error => {
+                console.error("Error adding photo:", error);
+                reject(error);
+            });
         });
     },
     [actionTypes.getUserDetails] () {

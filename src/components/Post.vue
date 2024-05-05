@@ -39,13 +39,13 @@
                     :class="{'btn-outline-primary': !userHasLiked, 'btn-primary text-dark': userHasLiked}"
                     @click="toggleLike">
               <i class="bi bi-suit-heart mx-1"></i>
-            </button>  
+            </button>
           </div>
           <div class="col-auto">
             <h6 class="mb-0">{{ postLikes }}</h6>
           </div>
           <div class="col-auto align-items-lg-start">
-            <button v-if="post.data.data.visibleForOthers === true" class="btn btn-outline-primary" @click="viewComments(postId)">Comments</button>
+            <button v-if="post.data.data.visibleForOthers === true" class="btn btn-outline-success" @click="viewComments(postId)">Comments</button>
           </div>
         </div>
       </div>
@@ -70,7 +70,7 @@ export default {
   },
   data() {
     return {
-      auth: getAuth(), // Store the initialized authentication object directly
+      auth: getAuth(),
       currentUserId: '',
       postId: this.post.id,
       postLikes: this.post.data.likes || 0,
@@ -82,7 +82,7 @@ export default {
     this.auth.onAuthStateChanged((user) => {
       if (user) {
         this.currentUserId = user.uid,
-        this.checkUserLike()
+            this.checkUserLike()
       }
     });
   },
