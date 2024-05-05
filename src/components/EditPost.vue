@@ -107,7 +107,7 @@ export default {
     return {
       postTitle: this.postData.title,
       postContent: this.postData.content,
-      postVisibleForOthers: this.postData.visibleForOthers
+      postVisibleForOthers: 'true'
     }
   },
   methods: {

@@ -14,8 +14,9 @@
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
     "core-js": "^3.8.3",
+    "fire": "^0.55.1",
     "firebase": "^10.11.1",
-    "register-service-worker": "^1.7.2",
+    "pwa": "^1.9.7",
     "sass": "^1.76.0",
     "sass-loader": "^14.2.1",
     "tools": "^0.0.0",
@@ -28,7 +29,6 @@
     "@babel/eslint-parser": "^7.12.16",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
-    "@vue/cli-plugin-pwa": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3"
