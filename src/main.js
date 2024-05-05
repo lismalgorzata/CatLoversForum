@@ -7,6 +7,7 @@ import { getFirestore } from "firebase/firestore";
 import "./assets/styles.scss";
 
 import { initializeApp } from "firebase/app";
+import './registerServiceWorker'
 
 const firebaseConfig = {
     apiKey: `${process.env.VUE_APP_APIKEY}`,
