@@ -101,6 +101,7 @@ export default {
     return {
       postTitle: ref(''),
       postContent: '',
+      postVisibleForOthers: 'true',
       audioContext: new (window.AudioContext || window.webkitAudioContext)(),
     };
   },
