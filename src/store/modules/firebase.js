@@ -28,7 +28,7 @@ export const actionTypes = {
     incrementLikes: '[firedb] Increment Likes',
     decrementLikes: '[firedb] Decrement Likes',
     checkUserLike: '[firedb] Check User Like',
-    addPhoto: '[firedb] addPhoto',
+    addImage: '[firedb] addImage',
 };
 
 export const mutationType = {
@@ -97,19 +97,46 @@ const actions = {
             })
         })
     },
-    [actionTypes.addPost] (context, data) {
-        return new Promise((resolve) => {
-            const auth = getAuth()
-            onAuthStateChanged(auth, (user) => {
-                addDoc(collection(db, 'posts'), {
-                    data,
+    [ actionTypes.addPost ](context, data) {
+        return new Promise((resolve, reject) => {
+            const auth = getAuth();
+            onAuthStateChanged(auth, async (user) => {
+                // Ensure that the user is authenticated before proceeding
+                if (!user) {
+                    reject('No authenticated user found.');
+                    return;
+                }
+
+                // Prepare the data to add to the database
+                const postData = {
+                    title: data.title,
+                    content: data.content,
+                    visibleForOthers: data.visibleForOthers,
                     uid: user.uid,
-                    created: serverTimestamp()
-                })
-                context.commit(mutationType.addPostSuccess)
-                resolve()
-            })
-        })
+                    created: serverTimestamp(),
+                };
+
+                try {
+                    // Add the new post data to the Firestore collection
+                    const docRef = await addDoc(collection(db, 'posts'), postData);
+
+                    // Create a response object that includes the new post ID and data
+                    const addedPost = {
+                        id: docRef.id,
+                        ...postData,
+                    };
+
+                    // Commit that the post was added successfully
+                    context.commit(mutationType.addPostSuccess);
+
+                    // Resolve the promise with the newly created post object
+                    resolve(addedPost);
+                } catch (error) {
+                    console.error("Error adding post:", error);
+                    reject(error);
+                }
+            });
+        });
     },
     [actionTypes.addComment] (context, { postId, comment }) {
         console.log("addCommentIsFiring");
@@ -255,20 +282,22 @@ const actions = {
             return false;
         });
     },
-    [actionTypes.addPhoto](context, { name, url, referenceId }) {
+    [actionTypes.addImage](context, { name, referenceId }) {
         return new Promise((resolve, reject) => {
-            addDoc(collection(db, 'photos'), {
-                name: name,
-                url: url,
-                referenceId: referenceId,
+            const imageDoc = {
+                name,
+                referenceId,
                 created: serverTimestamp()
-            }).then(() => {
-                console.log('Photo added successfully.');
-                resolve();
-            }).catch(error => {
-                console.error("Error adding photo:", error);
-                reject(error);
-            });
+            };
+            addDoc(collection(db, 'images'), imageDoc)
+                .then((docRef) => {
+                    console.log(`Photo added successfully. File name: "${name}"`);
+                    resolve({ id: docRef.id, ...imageDoc });
+                })
+                .catch((error) => {
+                    console.error("Error adding photo:", error);
+                    reject(error);
+                });
         });
     },
     [actionTypes.getUserDetails] () {

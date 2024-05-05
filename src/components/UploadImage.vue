@@ -36,7 +36,7 @@ export default {
       downloadUrl: '',
       uploadError: '',
       isLoggedIn: false,
-      auth: null
+      auth: null,
     };
   },
   mounted () {
@@ -60,6 +60,7 @@ export default {
         return;
       }
 
+      // Generate a unique file name
       const uniqueFileName = `${uuidv4()}_${this.selectedFile.name}`;
       const storageRef = ref(storage, `images/${uniqueFileName}`);
       const uploadTask = uploadBytesResumable(storageRef, this.selectedFile);
@@ -70,13 +71,16 @@ export default {
         console.error("Upload error:", error);
         this.uploadError = "Error uploading file: " + error.message;
       }, async () => {
-        // Pobierz link po zakończeniu przesyłania
+        // Obtain the download URL after successful upload
         this.downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
         console.log("Download URL:", this.downloadUrl);
 
-        // Reset błędów i schowaj pasek postępu
+        // Emit an event with the file name after a successful upload
+        this.$emit('image-uploaded', uniqueFileName);
+
+        // Reset progress and error states
         this.uploadError = '';
-        this.uploadProgress = null; // Lub ustaw na 0 w celu resetu
+        this.uploadProgress = null;
       });
     },
     truncatedFileName(name) {

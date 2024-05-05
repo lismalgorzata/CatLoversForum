@@ -67,7 +67,7 @@
                 <option value="false">Private</option>
               </select>
             </div>
-            <UploadImage></UploadImage>
+            <UploadImage @image-uploaded="imageUploaded"></UploadImage>
             <div>
               <button
                   class="btn btn-success p-1 m-1 text-white"
@@ -101,6 +101,7 @@ export default {
       postTitle: ref(''),
       postContent: '',
       postVisibleForOthers: 'true',
+      uploadedImageName: '',
       audioContext: new (window.AudioContext || window.webkitAudioContext)(),
     };
   },
@@ -118,22 +119,38 @@ export default {
         console.error("Error playing sound:", e);
       }
     },
+    imageUploaded(fileName) {
+      this.uploadedImageName = fileName;
+    },
     submit() {
       if (this.postTitle.length > 0 && this.postContent.length > 0) {
-        this.$store
-            .dispatch(actionTypes.addPost, {
-                  title: this.postTitle,
-                  content: this.postContent,
-                  visibleForOthers: this.postVisibleForOthers === 'true'
-                }
-            )
-            .then(async () => {
-              this.playSound();
-              await new Promise((resolve) => setTimeout(resolve, 2000))
-              this.$router.go()
-            })
+        this.$store.dispatch(actionTypes.addPost, {
+          title: this.postTitle,
+          content: this.postContent,
+          visibleForOthers: this.postVisibleForOthers === 'true'
+        }).then(async (addedPost) => {
+          console.log("Post added with ID:", addedPost.id);
+
+          this.playSound();
+
+          // Dispatch the addImage action using the uploaded file name
+          this.$store.dispatch(actionTypes.addImage, {
+            name: this.uploadedImageName, // Use the file name received from the event
+            referenceId: addedPost.id
+          }).then((addedImage) => {
+            console.log("Image added with ID:", addedImage.id);
+          }).catch((error) => {
+            console.error("Error adding image:", error);
+          });
+
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+
+          this.$router.go();
+        }).catch((error) => {
+          console.error("Error adding post:", error);
+        });
       }
-    },
+    }
   },
   components: { UploadImage }
 }
